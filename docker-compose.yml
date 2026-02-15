@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - '${PORT:-3000}:3000'
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+
+  # Development: mounts source code and runs with hot-reload.
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    ports:
+      - '${PORT:-3000}:3000'
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run start:dev
+    profiles:
+      - dev
