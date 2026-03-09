@@ -1,98 +1,216 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+## Magis Market Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend service for **Magis Market**, a Facebook Marketplace–style app for Ateneo de Davao University students.  
+No payments are handled by the backend — the focus is on **listings**, **images**, and **messaging** between students.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+### Overview
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Backend**: NestJS (TypeScript)
+- **Database**: Supabase Postgres  
+  - **Local dev**: Supabase CLI + Docker (local containers)  
+  - **Production**: Hosted Supabase project (swap environment variables)
+- **Storage**: Supabase Storage bucket `listing-images` for product photos
+- **Messaging**: Conversation + message tables for buyer–seller chat
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+### Tech stack & dependencies
 
-## Compile and run the project
+- **Runtime**
+  - **Node.js**: `22.x` (Docker base image uses `node:22-alpine`)
+- **Core**
+  - **NestJS**: `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`
+  - **TypeScript**: `typescript`
+  - **RxJS**: `rxjs`
+- **Configuration**
+  - **`@nestjs/config`**: global config module reading from `.env`
+- **Database & Storage**
+  - **`@supabase/supabase-js`**: Supabase client for DB + Storage
+  - **`supabase` (CLI)** (devDependency): manage local Supabase, migrations, and status
+- **Tooling**
+  - **Linting/Formatting**: `eslint`, `typescript-eslint`, `prettier`
+  - **Testing**: `jest`, `ts-jest`, `@types/jest`, `supertest`
 
-```bash
-# development
-$ npm run start
+See `package.json` for the full list of dependencies and versions.
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
-```
+### Prerequisites
 
-## Run tests
+- **Node.js** `>= 22`
+- **npm**
+- **Docker Desktop** (for:
+  - local Supabase containers managed by the Supabase CLI
+  - optional Dockerized NestJS app)
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+### Environment configuration
 
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Copy the example env file:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+2. Start local Supabase (this will print your local keys):
 
-## Resources
+```bash
+npm run supabase:start
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+3. From the Supabase output, copy:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Project URL** → `SUPABASE_URL`
+- **Publishable** key → `SUPABASE_ANON_KEY`
+- **Secret** key → `SUPABASE_SERVICE_ROLE_KEY`
 
-## Support
+…into your `.env` file.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+> **Note**: These keys are for **local dev only**. For production, replace them with values from your hosted Supabase project.
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Database & storage schema
 
-## License
+The schema is managed via Supabase migrations in `supabase/migrations/`:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- **`20260208000000_initial_schema.sql`**
+  - `profiles` – extends `auth.users` with full name, avatar, student ID, contact number
+  - `listings` – marketplace listings (title, description, price, category, condition, status)
+  - `listing_images` – image records pointing to Supabase Storage paths
+  - `conversations` – buyer–seller conversations per listing
+  - `messages` – chat messages within conversations
+  - Row Level Security (RLS) policies for all tables
+- **`20260208000001_storage_buckets.sql`**
+  - Storage bucket `listing-images` with:
+    - public read access for images
+    - authenticated-only upload
+    - owner-only update/delete
+
+Migrations are applied automatically when you run `npm run supabase:start` or `npm run supabase:reset`.
+
+---
+
+### Running the backend (local, without Docker)
+
+1. **Install dependencies**:
+
+```bash
+npm install
+```
+
+2. **Start local Supabase** (database + storage + auth):
+
+```bash
+npm run supabase:start
+```
+
+3. **Run the NestJS app in watch mode**:
+
+```bash
+npm run start:dev
+```
+
+4. The API will be available at:
+
+```text
+http://localhost:3000
+```
+
+The Supabase Studio will be available at the URL printed by `npm run supabase:start` (typically `http://127.0.0.1:54323`).
+
+---
+
+### Running with Docker
+
+The project includes a multi-stage `Dockerfile` and `docker-compose.yml`.
+
+#### Build the production image
+
+```bash
+npm run docker:build
+```
+
+#### Run the API in a container (production mode)
+
+```bash
+npm run docker:up
+```
+
+This:
+
+- builds the `production` target from the `Dockerfile`
+- runs the container exposing port `3000` (or `$PORT` from `.env`)
+
+#### Run the API in a dev container (hot-reload)
+
+```bash
+npm run docker:up:dev
+```
+
+This uses the `api-dev` service with:
+
+- your local source mounted into the container
+- `npm run start:dev` as the command
+
+#### Stop containers
+
+```bash
+npm run docker:down
+```
+
+---
+
+### Supabase CLI commands
+
+Convenience npm scripts:
+
+- **`npm run supabase:start`** – start local Supabase stack (Postgres, Auth, Storage, Studio)
+- **`npm run supabase:stop`** – stop local Supabase
+- **`npm run supabase:reset`** – reset DB and re-apply migrations + seeds
+- **`npm run supabase:status`** – show current URLs, keys, and container status
+- **`npm run supabase:migration:new`** – create a new empty migration file
+
+---
+
+### Testing & linting
+
+- **Unit tests**:
+
+```bash
+npm run test
+```
+
+- **E2E tests**:
+
+```bash
+npm run test:e2e
+```
+
+- **Coverage**:
+
+```bash
+npm run test:cov
+```
+
+- **Lint & format**:
+
+```bash
+npm run lint
+npm run format
+```
+
+---
+
+### Production notes
+
+- For **production**, use a hosted Supabase project:
+  - set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` to the hosted values
+  - do **not** run `npm run supabase:start` in production
+- The same NestJS application can run either:
+  - **directly on a server** (`npm run start:prod` after `npm run build`)
+  - **inside Docker** using `npm run docker:build` + `npm run docker:up`
+
