@@ -117,7 +117,7 @@ npm run start:dev
 4. The API will be available at:
 
 ```text
-http://localhost:3000
+http://localhost:4000
 ```
 
 The Supabase Studio will be available at the URL printed by `npm run supabase:start` (typically `http://127.0.0.1:54323`).
@@ -143,7 +143,7 @@ npm run docker:up
 This:
 
 - builds the `production` target from the `Dockerfile`
-- runs the container exposing port `3000` (or `$PORT` from `.env`)
+- runs the container exposing port `4000` (or `$PORT` from `.env`)
 
 #### Run the API in a dev container (hot-reload)
 
