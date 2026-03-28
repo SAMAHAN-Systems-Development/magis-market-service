@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SupabaseModule } from './supabase';
+import { CartModule } from './cart/cart.module';
 import { ProductsModule } from './products/products.module';
 import { FavoritesModule } from './favorites/favorites.module';
 
@@ -13,6 +14,7 @@ import { FavoritesModule } from './favorites/favorites.module';
       envFilePath: '.env',
     }),
     SupabaseModule,
+    CartModule,
     ProductsModule,
     FavoritesModule,
   ],
