@@ -7,8 +7,10 @@ import {
   ParseUUIDPipe,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('api/favorites')
 export class FavoritesController {
@@ -24,12 +26,14 @@ export class FavoritesController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   async listFavorites(@Headers() headers: Record<string, string | string[] | undefined>) {
     const userId = this.getUserIdFromHeaders(headers);
     return this.favoritesService.getUserFavorites(userId);
   }
 
   @Post(':productId')
+    @UseGuards(AuthGuard)
   async addFavorite(
     @Headers() headers: Record<string, string | string[] | undefined>,
     @Param('productId', new ParseUUIDPipe()) productId: string,
@@ -40,6 +44,7 @@ export class FavoritesController {
   }
 
   @Delete(':productId')
+    @UseGuards(AuthGuard)
   async removeFavorite(
     @Headers() headers: Record<string, string | string[] | undefined>,
     @Param('productId', new ParseUUIDPipe()) productId: string,
