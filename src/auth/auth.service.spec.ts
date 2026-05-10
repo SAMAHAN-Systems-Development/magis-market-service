@@ -4,7 +4,9 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
+
   const getUser = jest.fn();
+
   const supabaseService = {
     getClient: jest.fn(() => ({
       auth: {
@@ -34,15 +36,18 @@ describe('AuthService', () => {
   });
 
   describe('validateToken', () => {
-    it('should return the Supabase user when the token is valid', async () => {
+    it('should return the Supabase user when token is valid', async () => {
       const user = {
         id: 'user-1',
-        email: 'user@example.com',
+        email: 'user@addu.edu.ph',
       };
-      getUser.mockResolvedValue({
+
+      const supabaseResponse = {
         data: { user },
         error: null,
-      });
+      };
+
+      getUser.mockResolvedValue(supabaseResponse);
 
       await expect(service.validateToken('valid-token')).resolves.toEqual(user);
       expect(supabaseService.getClient).toHaveBeenCalledTimes(1);
@@ -50,20 +55,24 @@ describe('AuthService', () => {
     });
 
     it('should return null when Supabase returns an error', async () => {
-      getUser.mockResolvedValue({
+      const supabaseResponse = {
         data: { user: null },
         error: new Error('invalid token'),
-      });
+      };
+
+      getUser.mockResolvedValue(supabaseResponse);
 
       await expect(service.validateToken('bad-token')).resolves.toBeNull();
       expect(getUser).toHaveBeenCalledWith('bad-token');
     });
 
     it('should return null when Supabase returns no user', async () => {
-      getUser.mockResolvedValue({
+      const supabaseResponse = {
         data: { user: null },
         error: null,
-      });
+      };
+
+      getUser.mockResolvedValue(supabaseResponse);
 
       await expect(service.validateToken('unknown-token')).resolves.toBeNull();
       expect(getUser).toHaveBeenCalledWith('unknown-token');

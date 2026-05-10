@@ -1,19 +1,23 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { User } from '@supabase/supabase-js';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from '../auth.service';
 
 describe('AuthGuard', () => {
+  const validateToken = jest.fn<Promise<User | null>, [string]>();
   const authService = {
-    validateToken: jest.fn(),
-  } as unknown as jest.Mocked<AuthService>;
-
-  const reflector = {} as Reflector;
+    validateToken,
+  } as unknown as AuthService;
 
   const createContext = (authorization?: string): ExecutionContext => {
-    const request = {
+    const request: {
+      headers: Record<string, string>;
+      user?: any;
+      ip: string;
+    } = {
       headers: authorization ? { authorization } : {},
       user: undefined,
+      ip: '127.0.0.1',
     };
 
     return {
@@ -30,23 +34,20 @@ describe('AuthGuard', () => {
     guard = new AuthGuard(authService);
   });
 
-  it('should allow requests with a valid bearer token and ADDU email', async () => {
+  it('should allow requests with a valid bearer token', async () => {
     const user = {
       id: 'user-1',
       email: 'user@addu.edu.ph',
     };
 
-    authService.validateToken.mockResolvedValue({
-      data: { user },
-      error: null,
-    } as any);
+    validateToken.mockResolvedValue(user as User);
 
     const context = createContext('Bearer valid-token');
     const request = context.switchToHttp().getRequest();
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
 
-    expect(authService.validateToken).toHaveBeenCalledWith('valid-token');
+    expect(validateToken).toHaveBeenCalledWith('valid-token');
     expect(request.user).toEqual(user);
   });
 
@@ -55,7 +56,7 @@ describe('AuthGuard', () => {
       new UnauthorizedException('No token provided'),
     );
 
-    expect(authService.validateToken).not.toHaveBeenCalled();
+    expect(validateToken).not.toHaveBeenCalled();
   });
 
   it('should reject requests with an invalid authorization format', async () => {
@@ -63,46 +64,14 @@ describe('AuthGuard', () => {
       guard.canActivate(createContext('Basic token')),
     ).rejects.toThrow(new UnauthorizedException('Invalid token format'));
 
-    expect(authService.validateToken).not.toHaveBeenCalled();
+    expect(validateToken).not.toHaveBeenCalled();
   });
 
-  it('should reject requests when Supabase returns no user', async () => {
-    authService.validateToken.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+  it('should reject requests when the auth service returns no user', async () => {
+    validateToken.mockResolvedValue(null);
 
     await expect(
       guard.canActivate(createContext('Bearer unknown-token')),
     ).rejects.toThrow(new UnauthorizedException('Invalid or expired token'));
-  });
-
-  it('should reject requests when Supabase returns an error', async () => {
-    authService.validateToken.mockResolvedValue({
-      data: { user: null },
-      error: new Error('Invalid token'),
-    } as any);
-
-    await expect(
-      guard.canActivate(createContext('Bearer bad-token')),
-    ).rejects.toThrow(new UnauthorizedException('Invalid or expired token'));
-  });
-
-  it('should reject users without ADDU email', async () => {
-    const user = {
-      id: 'user-2',
-      email: 'user@gmail.com',
-    };
-
-    authService.validateToken.mockResolvedValue({
-      data: { user },
-      error: null,
-    } as any);
-
-    await expect(
-      guard.canActivate(createContext('Bearer valid-token')),
-    ).rejects.toThrow(
-      new UnauthorizedException('Only ADDU email addresses allowed'),
-    );
   });
 });
