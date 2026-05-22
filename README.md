@@ -8,8 +8,8 @@ No payments are handled by the backend — the focus is on **listings**, **image
 ### Overview
 
 - **Backend**: NestJS (TypeScript)
-- **Database**: Supabase Postgres  
-  - **Local dev**: Supabase CLI + Docker (local containers)  
+- **Database**: Supabase Postgres
+  - **Local dev**: Supabase CLI + Docker (local containers)
   - **Production**: Hosted Supabase project (swap environment variables)
 - **Storage**: Supabase Storage bucket `listing-images` for product photos
 - **Messaging**: Conversation + message tables for buyer–seller chat
@@ -91,6 +91,29 @@ The schema is managed via Supabase migrations in `supabase/migrations/`:
     - owner-only update/delete
 
 Migrations are applied automatically when you run `npm run supabase:start` or `npm run supabase:reset`.
+
+---
+
+### Local seed data
+
+Local seed data is defined in [supabase/seed.sql](supabase/seed.sql) and is loaded on `npm run supabase:reset`.
+
+Seeded test users (all use password: `password`):
+
+- seller1@addu.edu.ph (role: SELLER)
+- admin@addu.edu.ph (role: ADMIN)
+- student@addu.edu.ph (role: BUYER)
+
+The `role` is stored in Supabase user metadata (`user_metadata.role`). The backend AuthGuard should read from metadata for role checks until a dedicated profile role column is added.
+
+Seeded data includes:
+
+- 12 listings total
+- Categories represented: textbooks (1), electronics (3), furniture (2), clothing (2), supplies (3), others (1)
+- Listings per seller: 6 for seller1@addu.edu.ph, 6 for admin@addu.edu.ph
+- Listing images: 12 total (1 per listing, `display_order = 0`)
+- Favorites: 2 listings favorited by student@addu.edu.ph
+- Cart: 1 cart for student@addu.edu.ph with 2 cart items (qty 1 and qty 2)
 
 ---
 
@@ -213,4 +236,3 @@ npm run format
 - The same NestJS application can run either:
   - **directly on a server** (`npm run start:prod` after `npm run build`)
   - **inside Docker** using `npm run docker:build` + `npm run docker:up`
-
