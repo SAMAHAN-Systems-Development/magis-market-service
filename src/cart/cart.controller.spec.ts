@@ -3,6 +3,7 @@ import { CartController } from './cart.controller';
 import { CartService } from './cart.service';
 import { SupabaseService } from 'src/supabase';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { PATH_METADATA } from '@nestjs/common/constants';
 
 describe('CartController', () => {
   let controller: CartController;
@@ -34,5 +35,9 @@ describe('CartController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should use the shared api route prefix', () => {
+    expect(Reflect.getMetadata(PATH_METADATA, CartController)).toBe('api/cart');
   });
 });
