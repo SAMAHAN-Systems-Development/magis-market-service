@@ -15,7 +15,7 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 
-@Controller('cart')
+@Controller('api/cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
