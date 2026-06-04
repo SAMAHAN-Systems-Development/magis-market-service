@@ -36,7 +36,7 @@ describe('AuthService', () => {
   });
 
   describe('validateToken', () => {
-    it('should return the Supabase user when token is valid', async () => {
+    it('should return the Supabase auth response when token is valid', async () => {
       const user = {
         id: 'user-1',
         email: 'user@addu.edu.ph',
@@ -49,12 +49,14 @@ describe('AuthService', () => {
 
       getUser.mockResolvedValue(supabaseResponse);
 
-      await expect(service.validateToken('valid-token')).resolves.toEqual(user);
+      await expect(service.validateToken('valid-token')).resolves.toEqual(
+        supabaseResponse,
+      );
       expect(supabaseService.getClient).toHaveBeenCalledTimes(1);
       expect(getUser).toHaveBeenCalledWith('valid-token');
     });
 
-    it('should return null when Supabase returns an error', async () => {
+    it('should return the Supabase auth response when Supabase returns an error', async () => {
       const supabaseResponse = {
         data: { user: null },
         error: new Error('invalid token'),
@@ -62,11 +64,13 @@ describe('AuthService', () => {
 
       getUser.mockResolvedValue(supabaseResponse);
 
-      await expect(service.validateToken('bad-token')).resolves.toBeNull();
+      await expect(service.validateToken('bad-token')).resolves.toEqual(
+        supabaseResponse,
+      );
       expect(getUser).toHaveBeenCalledWith('bad-token');
     });
 
-    it('should return null when Supabase returns no user', async () => {
+    it('should return the Supabase auth response when Supabase returns no user', async () => {
       const supabaseResponse = {
         data: { user: null },
         error: null,
@@ -74,7 +78,9 @@ describe('AuthService', () => {
 
       getUser.mockResolvedValue(supabaseResponse);
 
-      await expect(service.validateToken('unknown-token')).resolves.toBeNull();
+      await expect(service.validateToken('unknown-token')).resolves.toEqual(
+        supabaseResponse,
+      );
       expect(getUser).toHaveBeenCalledWith('unknown-token');
     });
   });
