@@ -9,8 +9,11 @@ export class FavoritesService {
     private readonly productsService: ProductsService,
   ) {}
 
-  async getUserFavorites(userId: string): Promise<ProductDto[]> {
-    const client = this.supabase.getClient();
+  async getUserFavorites(
+    userId: string,
+    accessToken: string,
+  ): Promise<ProductDto[]> {
+    const client = this.supabase.getUserClient(accessToken);
 
     const { data, error } = await client
       .from('favorites')
@@ -43,14 +46,18 @@ export class FavoritesService {
       .map((listing: any) => this.productsService.toProductDto(listing));
   }
 
-  async addFavorite(userId: string, productId: string): Promise<void> {
+  async addFavorite(
+    userId: string,
+    accessToken: string,
+    productId: string,
+  ): Promise<void> {
     // Ensure the product exists first; throw 404 if not.
     const product = await this.productsService.getProductById(productId);
     if (!product) {
       throw new NotFoundException(`Product ${productId} not found`);
     }
 
-    const client = this.supabase.getAdminClient();
+    const client = this.supabase.getUserClient(accessToken);
 
     const { error } = await client
       .from('favorites')
@@ -69,8 +76,12 @@ export class FavoritesService {
     }
   }
 
-  async removeFavorite(userId: string, productId: string): Promise<void> {
-    const client = this.supabase.getAdminClient();
+  async removeFavorite(
+    userId: string,
+    accessToken: string,
+    productId: string,
+  ): Promise<void> {
+    const client = this.supabase.getUserClient(accessToken);
 
     const { data, error } = await client
       .from('favorites')
