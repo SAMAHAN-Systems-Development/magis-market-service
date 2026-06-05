@@ -13,7 +13,7 @@ export class CartService {
 
   async getCart(userId: string) {
     const { data, error } = await this.supabase
-      .getClient()
+      .getAdminClient()
       .from('carts')
       .select('*, cart_items(*)')
       .eq('user_id', userId)
@@ -26,7 +26,7 @@ export class CartService {
 
   async addItem(userId: string, dto: CreateCartItemDto) {
     const { listingId, quantity } = dto;
-    const client = this.supabase.getClient();
+    const client = this.supabase.getAdminClient();
 
     // checks if listing exists
     await this.findListingOrThrow(listingId);
@@ -70,7 +70,7 @@ export class CartService {
   }
 
   async updateItemQuant(userId: string, listingId: string, dto: UpdateCartDto) {
-    const client = this.supabase.getClient();
+    const client = this.supabase.getAdminClient();
 
     await this.findListingOrThrow(listingId);
 
@@ -92,7 +92,7 @@ export class CartService {
   }
 
   async removeItem(userId: string, listingId: string) {
-    const client = this.supabase.getClient();
+    const client = this.supabase.getAdminClient();
 
     // checks if listing exists
     await this.findListingOrThrow(listingId);
@@ -117,7 +117,7 @@ export class CartService {
 
   private async findCartOrThrow(userId: string) {
     const { data: cart, error: cartError } = await this.supabase
-      .getClient()
+      .getAdminClient()
       .from('carts')
       .select('id')
       .eq('user_id', userId)
@@ -133,7 +133,7 @@ export class CartService {
   // private helper for finding Listing
   private async findListingOrThrow(listingId: string) {
     const { data: listing, error: listingError } = await this.supabase
-      .getClient()
+      .getAdminClient()
       .from('listings')
       .select('id')
       .eq('id', listingId);
